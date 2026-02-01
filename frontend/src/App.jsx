@@ -4,6 +4,8 @@ function App() {
   const [resumeText, setResumeText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
+  const [file, setFile] = useState(null);
+
 
   const analyzeResume = async () => {
     const response = await fetch("http://localhost:5000/api/analyze", {
@@ -20,6 +22,25 @@ function App() {
     const data = await response.json();
     setResult(data);
   };
+
+  const handlePdfUpload = async () => {
+    if (!file) {
+      alert("Please select a PDF first");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    const response = await fetch("http://localhost:5000/api/analyze/pdf", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+    setResult(data);
+  };
+
 
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
@@ -40,28 +61,45 @@ function App() {
         rows={6}
         style={{ width: "100%", marginBottom: "10px" }}
       />
+      <input
+        type="file"
+        accept="application/pdf"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+      <button onClick={handlePdfUpload}>
+        Analyze PDF
+      </button>
 
       <button onClick={analyzeResume}>Analyze Resume</button>
 
       {result && (
-        <div style={{ marginTop: "20px" }}>
-          <p><strong>Score:</strong> {result.score}</p>
+        <div>
+          <p>Score: {result.score}</p>
 
-          <p><strong>Missing Skills:</strong></p>
-          <ul>
-            {result.missingSkills.map((skill, idx) => (
-              <li key={idx}>{skill}</li>
-            ))}
-          </ul>
+          {Array.isArray(result.missingSkills) && (
+            <>
+              <h3>Missing Skills:</h3>
+              <ul>
+                {result.missingSkills.map((skill, index) => (
+                  <li key={index}>{skill}</li>
+                ))}
+              </ul>
+            </>
+          )}
 
-          <p><strong>Suggestions:</strong></p>
-          <ul>
-            {result.suggestions.map((s, idx) => (
-              <li key={idx}>{s}</li>
-            ))}
-          </ul>
+          {Array.isArray(result.suggestions) && (
+            <>
+              <h3>Suggestions:</h3>
+              <ul>
+                {result.suggestions.map((s, index) => (
+                  <li key={index}>{s}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
+
     </div>
   );
 }
