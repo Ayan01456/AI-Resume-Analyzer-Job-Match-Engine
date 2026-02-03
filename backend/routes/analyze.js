@@ -1,7 +1,8 @@
 
 const express = require("express");
 const router = express.Router();
-const { analyzeResume, analyzeText } = require("../controllers/analyzeController");
+const { analyzeResume } = require("../controllers/analyzeController");
+
 
 
 // Existing JSON route
@@ -37,27 +38,25 @@ router.post("/pdf", upload.single("resume"), async (req, res) => {
     const pdfData = await pdfParse(dataBuffer);
     const resumeText = pdfData.text;
 
-    // Use your existing analyze function
-    const result = analyzeText(resumeText);
+    // Inject data into request body
+    req.body.resumeText = resumeText;
+    req.body.jobDescription = req.body.jobDescription || "";
 
-    if (!result) {
-      return res.status(500).json({ error: "Analysis failed" });
-    }
+    // Hand over control to controller
+    return analyzeResume(req, res);
 
-
-    fs.unlinkSync(req.file.path); // delete PDF after parsing
-    res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to parse PDF" });
-  }finally {
-     // this is to make sure to delete the pdf no matte what
+    res.status(500).json({ success: false, error: "Failed to parse PDF" });
+
+  } finally {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
       console.log("Cleanup: Temporary file deleted.");
     }
   }
 });
+
 
 module.exports = router;
 

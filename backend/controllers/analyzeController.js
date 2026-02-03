@@ -1,26 +1,27 @@
-function analyzeText(resumeText, jobDescription = "") {
-  // Later Gemini will go here
-  return {
-    score: 75,
-    missingSkills: ["System Design", "AWS"],
-    suggestions: [
-      "Highlight measurable impact in experience",
-      "Mention any cloud or backend projects",
-    ],
-  };
-}
+const { analyzeWithGemini } = require("../services/geminiService");
 
 exports.analyzeResume = async (req, res) => {
-  const { resumeText, jobDescription } = req.body;
+  try {
+    const { resumeText, jobDescription } = req.body;
 
-  if (!resumeText || !jobDescription) {
-    return res.status(400).json({
-      error: "resumeText and jobDescription are required",
+    if (!resumeText || !jobDescription) {
+      return res.status(400).json({
+        success: false,
+        error: "resumeText and jobDescription are required",
+      });
+    }
+
+    const aiResult = await analyzeWithGemini(resumeText, jobDescription);
+
+    return res.json({
+      success: true,
+      data: aiResult,
+    });
+  } catch (error) {
+    console.error("Analyze error:", error.message || error);
+    return res.status(500).json({
+      success: false,
+      error: "Resume analysis failed",
     });
   }
-
-  const result = analyzeText(resumeText, jobDescription);
-  return res.json(result);
 };
-
-exports.analyzeText = analyzeText;

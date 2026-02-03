@@ -5,6 +5,7 @@ import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <div style={{ display: "flex", justifyContent: "center" }}></div>
     <App />
   </StrictMode>,
 )
