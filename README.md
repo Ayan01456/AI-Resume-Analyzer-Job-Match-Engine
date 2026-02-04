@@ -1,49 +1,89 @@
-AI Resume Analyzer & Job Match Engine
+# AI Resume Analyzer & Match Engine
 
-Tech Stack: Node.js, Express, React, LLM APIs
+A full-stack application that analyzes the compatibility between a user's resume and a job description using the **Gemini 2.5 Flash API**.
 
-##Overview
+## 🔗 Live Links
+- **Frontend:** https://ai-resume-analyzer-seven-omega.vercel.app  
+- **Backend:** Hosted on Render (Node.js)
 
-This project is a web application that analyzes resumes in PDF format and matches them with job descriptions using LLM APIs. It extracts relevant skills and experience from resumes and provides a job match score along with improvement suggestions.
 
-##Features
 
-Upload and parse PDF resumes
+## 🏗️ Project Structure
+```text
+AI-RESUME-ENGINE/
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   └── index.css
+│   └── .env
+│
+└── README.md
+```
 
-Extract skills, experience summary, and role relevance
+## 🔄 System Flow Chart
 
-Match resumes with job descriptions
+This diagram represents the end-to-end lifecycle of a single analysis request:
+```mermaid
+flowchart LR
+    A[User] -->|Pastes JD & Uploads PDF| B[React Frontend]
+    B -->|POST Request / FormData| C[Express Backend]
+    C -->|pdf-parse| D[Text Extraction Layer]
+    D -->|Resume + JD Text| E[Gemini 2.5 Flash AI]
+    E -->|Structured JSON Response| F[Backend Sanitization]
+    F -->|Match % & Skills| G[React UI Display]
+    
+```
+## 🛠️ Tech Stack
+```
+Frontend: React.js, Vite.
+Backend: Node.js, Express.js.
+AI: Google Gemini 2.5 Flash.
+File Handling: Multer (Middleware) and PDF-Parse.
+Deployment: Vercel (Frontend) and Render (Backend).
+```
 
-Generate resume match score and missing skill analysis
+## 📖 How to Use
+```
+Paste the Job Description in the designated text area.
 
-REST API–based backend design
+Upload your Resume (PDF).
 
-##Architecture
+Click Analyze Resume.
 
-Frontend: React for resume upload and job description input
+View your Match Percentage, Missing Skills, and Improvement Suggestions.
+```
 
-Backend: Node.js and Express for REST APIs and resume processing
+## 💻 Local Setup & Installation
+```
+If you want to run this project on your local machine, follow these steps:
 
-AI Layer: LLM APIs used for structured resume analysis and job matching
-
-##API Endpoints
-
-POST /analyze-resume – Parses resume PDF and extracts structured information
-
-POST /match-job – Matches resume data with job description and returns analysis
-
-##Setup
-
+1. Clone the Repository
+Bash
 git clone https://github.com/Ayan01456/AI-Resume-Analyzer-Job-Match-Engine
-
-cd ai-resume-analyzer
-
+cd AI-Resume-Analyzer-Job-Match-Engine
+2. Backend Setup
+Bash
+cd backend
 npm install
+Create a .env file in the backend folder.
 
-Create a .env file:
+Add your Gemini API Key: GEMINI_API_KEY=your_key_here.
 
-LLM_API_KEY=your_api_key_here
+Start the server: node server.js.
 
-Run the server:
+3. Frontend Setup
+Bash
+cd ../frontend
+npm install
+Create a .env file in the frontend folder.
 
-npm start
+Add the backend URL: VITE_API_URL=http://localhost:5000.
+
+Start the app: npm run dev.
+```
+
