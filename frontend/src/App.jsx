@@ -190,7 +190,11 @@ function App() {
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
             rows={6}
-            style={textareaStyle}
+            style={{
+              ...textareaStyle,
+              backgroundColor: "#fff",
+              color: "#000", 
+            }}
           />
         </div>
 
