@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [resumeText, setResumeText] = useState("");
@@ -8,6 +8,22 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  const [isSystemReady, setIsSystemReady] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  useEffect(() => {
+    const pingBackend = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/health`);
+        if (res.ok) setIsSystemReady(true);
+      } catch (err) {
+        console.log("Backend warming up...");
+        setTimeout(pingBackend, 5000);
+      }
+    };
+    pingBackend();
+  }, [API_BASE_URL]);
+
   const sectionStyle = {
     background: "#ffffff",
     padding: "16px",
@@ -16,7 +32,7 @@ function App() {
     marginTop: "16px",
   };
 
-  
+
   const textareaStyle = {
     width: "100%",
     marginTop: "8px",
@@ -24,11 +40,11 @@ function App() {
     borderRadius: "8px",
     border: "1px solid #ddd",
     resize: "vertical",
-    boxSizing: "border-box", 
+    boxSizing: "border-box",
   };
 
   const analyzeResume = async () => {
-    if (loading) return;
+    if (loading || !isSystemReady) return;
 
     if (!jobDescription.trim()) {
       alert("Please provide a job description.");
@@ -55,14 +71,14 @@ function App() {
         formData.append("resume", file);
         formData.append("jobDescription", jobDescription);
 
-        response = await fetch("http://localhost:5000/api/analyze/pdf", {
+        response = await fetch(`${API_BASE_URL}/api/analyze/pdf`, {
           method: "POST",
           body: formData,
         });
 
         data = await response.json();
       } else {
-        response = await fetch("http://localhost:5000/api/analyze", {
+        response = await fetch(`${API_BASE_URL}/api/analyze`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ resumeText, jobDescription }),
@@ -264,22 +280,21 @@ function App() {
         {/* Analyze Button */}
         <button
           onClick={analyzeResume}
-          disabled={loading}
+          disabled={loading || !isSystemReady}
           style={{
             width: "100%",
             padding: "14px",
             borderRadius: "10px",
             border: "none",
-            background: loading ? "#aaa" : "#4f46e5",
+            background: (!isSystemReady || loading) ? "#aaa" : "#4f46e5",
             color: "#fff",
             fontSize: "16px",
             fontWeight: "600",
-            cursor: loading ? "not-allowed" : "pointer",
+            cursor: (!isSystemReady || loading) ? "not-allowed" : "pointer",
           }}
         >
-          {loading ? "Analyzing..." : "Analyze Resume"}
+          {!isSystemReady ? "AI Engine Warming Up..." : loading ? "Analyzing..." : "Analyze Resume"}
         </button>
-
         {/* Results */}
         {result && (
           <div
@@ -375,14 +390,14 @@ function App() {
                         height: "26px",
                         borderRadius: "6px",
                         background: "#ffffff",
-                        color: "#353b46",      
+                        color: "#353b46",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
                         fontSize: "12px",
                         fontWeight: "700",
                         border: "1px solid #f3f4f6",
-                        boxShadow: "0 2px 5px rgba(0,0,0,0.06)", 
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.06)",
                       }}>
                         {i + 1}
                       </div>
@@ -405,14 +420,14 @@ function App() {
           <p style={{
             margin: 0,
             fontSize: '14px',
-            color: '#4b5563' 
+            color: '#4b5563'
           }}>
             Developed with ✨ by <span style={{ fontWeight: '600', color: '#4f46e5' }}>Ayan</span>
           </p>
           <p style={{
             margin: '4px 0 0',
             fontSize: '12px',
-            color: '#9ca3af' 
+            color: '#9ca3af'
           }}>
             Powered by Gemini 2.5 Flash • 2026
           </p>

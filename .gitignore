@@ -1,13 +1,15 @@
 # Node modules
 node_modules/
 
-# Environment variables (API keys)
+# Ignores .env in both frontend and backend
 .env
 
 # Logs
 *.log
 
-# Optional system files
+# Ignores the temporary PDFs inside the backend uploads folder
+backend/uploads/*
+
+# System files
 .DS_Store
 Thumbs.db
-

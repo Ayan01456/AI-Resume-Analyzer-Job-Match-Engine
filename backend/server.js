@@ -4,35 +4,24 @@ require("dotenv").config();
 
 const app = express();
 
+const fs = require("fs");
+
+// Ensure uploads folder exists
+if (!fs.existsSync("./uploads")) {
+    fs.mkdirSync("./uploads");
+}
+
 app.use(cors());
 app.use(express.json());
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: "awake" });
+});
 
 app.get("/", (req, res) => {
   res.send("AI Resume Analyzer Backend is running");
 });
 const multer = require("multer");
 const path = require("path");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === "application/pdf") {
-      cb(null, true);
-    } else {
-      cb(new Error("Only PDF files are allowed"), false);
-    }
-  }
-});
 
 
 const PORT = process.env.PORT || 5000;
