@@ -7,8 +7,9 @@ node_modules/
 # Logs
 *.log
 
-# Ignores the temporary PDFs inside the backend uploads folder
+# Ignores the temporary PDFs but KEEPS the .gitkeep file
 backend/uploads/*
+!backend/uploads/.gitkeep
 
 # System files
 .DS_Store
