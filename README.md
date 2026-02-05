@@ -29,7 +29,7 @@ AI-RESUME-ENGINE/
 
 This diagram represents the end-to-end lifecycle of a single analysis request:
 ```mermaid
-flowchart LR
+graph TD
     A[User] -->|Pastes JD & Uploads PDF| B[React Frontend]
     B -->|POST Request / FormData| C[Express Backend]
     C -->|pdf-parse| D[Text Extraction Layer]
