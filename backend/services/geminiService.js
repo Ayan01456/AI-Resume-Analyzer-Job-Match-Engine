@@ -6,6 +6,7 @@ const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 async function analyzeWithGemini(resumeText, jobDescription) {
   try {
     // Using the 2.5 Flash model 
+    const start = Date.now();
     const result = await client.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
@@ -13,15 +14,21 @@ async function analyzeWithGemini(resumeText, jobDescription) {
         parts: [{
           text: `You are an ATS. Analyze the Resume against the JD. 
                  Return ONLY a JSON object with keys: score, missingSkills, suggestions, summary.
+                 Keep entire response under 500 tokens.
                  
                  RESUME: ${resumeText}
                  JD: ${jobDescription || "N/A"}`
         }]
       }],
       config: {
-        responseMimeType: "application/json"
+        responseMimeType: "application/json",
+        thinkingConfig: {
+          thinkingBudget: 0
+        }
       }
     });
+    console.log(`Gemini response time: ${Date.now() - start}ms`);
+
 
     // --- THE ULTIMATE 2026 EXTRACTION ---
     // We check three different places where the text might be hiding 
