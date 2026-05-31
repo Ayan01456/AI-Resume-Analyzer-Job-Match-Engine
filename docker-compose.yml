@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  # Redis Cashing Container
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis_cache_container
+    ports:
+      - "6379:6379"  
+    restart: always
+
+  # Backend Container
+  backend-server:
+    build: ./backend
+    container_name: node_backend_container
+    ports:
+      - "5000:5000"  
+    environment:
+      - REDIS_URL=redis://redis-cache:6379
+      - PORT=5000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - redis-cache 
+    restart: always
