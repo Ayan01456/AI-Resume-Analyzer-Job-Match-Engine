@@ -1,0 +1,34 @@
+name: Continuous Deployment to Production
+
+on:
+  push:
+    branches:
+      - feature/dockerized-redis-caching  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: 22
+          script: |
+            # Navigate to root folder on AWS
+            cd ~/AI-Resume-Analyzer-Job-Match-Engine
+            
+            # Pull the new code from GitHub
+            git pull origin feature/dockerized-redis-caching
+            
+            # Rebuild the application containers
+            docker compose up --build -d
+            
+            # Clean up old ghost Docker images 
+            docker image prune -f
